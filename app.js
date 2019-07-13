@@ -2,12 +2,16 @@ const express = require("express");
 
 const app = express();
 
+app.set("view engine", "pug"); // Pug will be used as the template engine
+
 app.get("/", (req, res) => {
-  res.send("<h1>Hello from the home route</h1>");
+  res.render("index"); // renders index.pug
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<h1>Hello from the hello route</h1>");
+app.get("/cards", (req, res) => {
+  res.render("card", {
+    prompt: "Who is buried in Grant's tomb?"
+  });
 });
 
 app.listen(3000, () => {
