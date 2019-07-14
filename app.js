@@ -1,17 +1,45 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 app.set("view engine", "pug"); // Pug will be used as the template engine
 
 app.get("/", (req, res) => {
-  res.render("index"); // renders index.pug
+  const name = req.cookies.username;
+  if (name) {
+    res.render("index", { name }); // renders index.pug
+  } else {
+    res.redirect("/hello");
+  }
 });
 
 app.get("/cards", (req, res) => {
   res.render("card", {
     prompt: "Who is buried in Grant's tomb?"
   });
+});
+
+app.get("/hello", (req, res) => {
+  const name = req.cookies.username;
+  if (name) {
+    res.redirect("/"); // renders index.pug
+  } else {
+    res.render("hello");
+  }
+});
+
+app.post("/hello", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect("/");
+});
+
+app.post("/goodbye", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/hello");
 });
 
 app.listen(3000, () => {
