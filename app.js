@@ -5,48 +5,15 @@ const cookieParser = require("cookie-parser");
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use("/static", express.static("public"));
 
 app.set("view engine", "pug"); // Pug will be used as the template engine
 
-app.get("/", (req, res) => {
-  const name = req.cookies.username;
-  if (name) {
-    res.render("index", { name }); // renders index.pug
-  } else {
-    res.redirect("/hello");
-  }
-});
+const mainRoutes = require("./routes");
+const cardRoutes = require("./routes/cards");
 
-app.get("/cards", (req, res) => {
-  res.render("card", {
-    prompt: "Who is buried in Grant's tomb?"
-  });
-});
-
-app.get("/hello", (req, res) => {
-  const name = req.cookies.username;
-  if (name) {
-    res.redirect("/"); // renders index.pug
-  } else {
-    res.render("hello");
-  }
-});
-
-app.post("/hello", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/");
-});
-
-app.post("/goodbye", (req, res) => {
-  res.clearCookie("username");
-  res.redirect("/hello");
-});
-
-app.use((req, res, next) => {
-  const err = new Error("Not found");
-  err.status = 404;
-  next(err);
-});
+app.use(mainRoutes);
+app.use("/cards", cardRoutes);
 
 app.use((err, req, res, next) => {
   res.locals.error = err;
